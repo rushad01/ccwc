@@ -5,3 +5,14 @@
 #define COLOR_MAGENTA "\x1b[35m"
 #define COLOR_CYAN "\x1b[36m"
 #define COLOR_RESET "\x1b[0m"
+
+#include <cstdio>
+
+void help() {
+  printf("\nUsage: ccwc.exe [options] file...\n");
+  printf("--help \t Display this information,\n");
+  printf("-c     \t Output file size in bytes.\n");
+  printf("-l     \t Output line count.\n");
+  printf("-w     \t Output number words in a file.\n");
+  printf("-m     \t Output number of characters in a file.\n");
+}

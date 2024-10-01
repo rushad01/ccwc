@@ -1,23 +1,28 @@
 #include "FileHandler.h"
-#include <algorithm>
+#include <cstdio>
 #include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <ios>
 #include <iosfwd>
 #include <iostream>
-#include <iterator>
 #include <sstream>
 #include <string>
 
 FileHandler::FileHandler(const FileHandler &rhs)
-    : m_filename(new char[std::strlen(rhs.m_filename) + 1]) {
+    : m_fileName{new char[std::strlen(rhs.m_fileName) + 1]},
+      m_fileSize{rhs.m_fileSize}, m_lineCount{rhs.m_lineCount},
+      m_wordCount{rhs.m_wordCount}, m_charCount{rhs.m_charCount} {
   // copy constructor
 }
 
-FileHandler::FileHandler(FileHandler &&rhs) : m_filename(rhs.m_filename) {
+FileHandler::FileHandler(FileHandler &&rhs)
+    : m_fileName(rhs.m_fileName), m_fileSize(std::move(rhs.m_fileSize)),
+      m_lineCount(std::move(rhs.m_lineCount)),
+      m_wordCount(std::move(rhs.m_wordCount)),
+      m_charCount(std::move(rhs.m_charCount)) {
   // move constructor
-  rhs.m_filename = nullptr;
+  rhs.m_fileName = nullptr;
 }
 
 FileHandler &FileHandler::operator=(const FileHandler &rhs) {
@@ -25,9 +30,13 @@ FileHandler &FileHandler::operator=(const FileHandler &rhs) {
   if (this == &rhs)
     return *this;
 
-  delete[] this->m_filename;
-  m_filename = new char[std::strlen(rhs.m_filename) + 1];
-  std::strcpy(m_filename, rhs.m_filename);
+  delete[] this->m_fileName;
+  m_fileName = new char[std::strlen(rhs.m_fileName) + 1];
+  std::strcpy(m_fileName, rhs.m_fileName);
+  m_fileSize = rhs.m_fileSize;
+  m_lineCount = rhs.m_lineCount;
+  m_wordCount = rhs.m_wordCount;
+  m_charCount = rhs.m_charCount;
 
   return *this;
 }
@@ -36,48 +45,46 @@ FileHandler &FileHandler::operator=(FileHandler &&rhs) {
   if (this == &rhs)
     return *this;
 
-  delete[] this->m_filename;
-  m_filename = rhs.m_filename;
-  rhs.m_filename = nullptr;
+  delete[] this->m_fileName;
+  m_fileName = std::move(rhs.m_fileName);
+  m_fileSize = std::move(rhs.m_fileSize);
+  m_lineCount = std::move(rhs.m_lineCount);
+  m_wordCount = std::move(rhs.m_wordCount);
+  m_charCount = std::move(rhs.m_charCount);
+  rhs.m_fileName = nullptr;
   return *this;
 }
 
-int FileHandler::fileSize() {
-  std::filesystem::path textFile = m_filename;
-  return std::filesystem::file_size(textFile);
-}
+void FileHandler::extractData() {
+  // file size
+  std::filesystem::path textFile = m_fileName;
+  m_fileSize = std::filesystem::file_size(textFile);
 
-int FileHandler::lineCount() {
-  std::ifstream myTextFile(m_filename);
-  myTextFile.unsetf(std::ios_base::skipws);
-
-  unsigned line_cout = std::count(std::istream_iterator<char>(myTextFile),
-                                  std::istream_iterator<char>(), '\n');
-
-  return line_cout;
-}
-
-int FileHandler::wordCount() {
   std::ifstream mytextFile;
-  mytextFile.open(m_filename);
+  mytextFile.open(m_fileName);
+
+  // character count
+  mytextFile.seekg(0, std::ios_base::end);
+  m_charCount = mytextFile.tellg();
+  mytextFile.seekg(0, std::ios_base::beg);
   std::string line;
-  int numLines{0};
-  int numWord{0};
+
+  // line and word count
   while (std::getline(mytextFile, line)) {
-    numLines++;
+    m_lineCount++;
 
     std::stringstream lineStream(line);
     while (std::getline(lineStream, line, ' ')) {
-      numWord++;
+      m_wordCount++;
     }
   }
   mytextFile.close();
-  return numWord;
 }
 
-int FileHandler::charCount() {
-  std::fstream myTextFile(m_filename);
-  myTextFile.seekg(0, std::ios_base::end);
-  std::streampos end_pos = myTextFile.tellg();
-  return end_pos;
-}
+int FileHandler::fileSize() { return m_fileSize; }
+
+int FileHandler::lineCount() { return m_lineCount; }
+
+int FileHandler::wordCount() { return m_wordCount; }
+
+int FileHandler::charCount() { return m_charCount; }

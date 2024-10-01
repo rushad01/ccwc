@@ -13,6 +13,6 @@ void help() {
   printf("--help \t Display this information,\n");
   printf("-c     \t Output file size in bytes.\n");
   printf("-l     \t Output line count.\n");
-  printf("-w     \t Output number words in a file.\n");
+  printf("-w     \t Output number of words in a file.\n");
   printf("-m     \t Output number of characters in a file.\n");
 }

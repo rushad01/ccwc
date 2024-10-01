@@ -2,6 +2,7 @@
 #include "helper.h"
 #include <cstdio>
 #include <cstring>
+#include <utility>
 
 int main(int argc, char *argv[]) {
 
@@ -16,15 +17,16 @@ int main(int argc, char *argv[]) {
     }
 
     if (argv[2] != nullptr) {
-      FileHandler myfile(argv[2]);
+      FileHandler myFile(argv[2]);
+      myFile.extractData();
       if (!strcmp("-c", argv[1])) {
-        printf("%d %s", myfile.fileSize(), argv[2]);
+        printf("%d %s", myFile.fileSize(), argv[2]);
       } else if (!strcmp("-l", argv[1])) {
-        printf("%d %s", myfile.lineCount(), argv[2]);
+        printf("%d %s", myFile.lineCount(), argv[2]);
       } else if (!strcmp("-w", argv[1])) {
-        printf("%d %s", myfile.wordCount(), argv[2]);
+        printf("%d %s", myFile.wordCount(), argv[2]);
       } else {
-        printf("%d %s", myfile.charCount(), argv[2]);
+        printf("%d %s", myFile.charCount(), argv[2]);
       }
     }
   }
